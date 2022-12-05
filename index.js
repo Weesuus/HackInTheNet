@@ -5,6 +5,16 @@ let txtpre = document.getElementById("in-pre");
 
 let FOLDER = "";
 
+let diskTest = {
+	"home": {
+		"weesus": {
+			"Desktop": {},
+			"Documents": {},
+			"ecc.txt": "Enniente oggi va cosi"
+		}
+	}, "bin": {}, "log":{}, "sys":{"osT.sys": "version:X\ntheme:sus"}
+};
+
 let nowPath = "/home/USERNAME/";
 let nowDisp = "[USERNAME@MACHINE FOLDER] ~ "; //HOME ~ - ANY OTHER $
 
@@ -29,7 +39,7 @@ function recognizeCommand(){
 		if(txt1.value.slice(3) != ''){
 			//PASSED
 		}else{
-			listFiles()
+			//NOT PASSED
 		}
 	}else{
 		visualizer();
@@ -44,60 +54,8 @@ function visualizer(){
 	}
 }
 
-function listFiles(){
-	let requestURL = './machineTest.json';
-	let request = new XMLHttpRequest();
-	request.open("GET", requestURL);
-	request.responseType = 'json';
-	request.send();
-
-	request.onload = function () {
-		const machineJ = request.response;
-		console.log(machineJ.disk)
-	}
-}
-
-function listJustFromFolder(passed){
-	let requestURL = "./machineTest.json";
-	let request = new XMLHttpRequest();
-	request.open("GET", requestURL);
-	request.responseType = 'json';
-	request.send();
-
-	let slashCounter = 0;
-	let tempo = "";
-	let counter = 0;
-	for(let i in passed){
-		counter += 1;
-		if(i == '/'){
-			slashCounter += 1;
-		}
-	}
-
-	request.onload = function () {
-		const machineJ = request.response;
-		//QUI
-	}
-}
-
-function fromPathToSus(passed){
-	let requestURL = './machineTest.json';
-	let request = new XMLHttpRequest();
-	request.open("GET", requestURL);
-	request.responseType = 'json';
-	request.send();
-
-	let resArr = [];
-
-	request.onload = function () {
-		const machineJ = request.response;
-		console.log(machineJ.disk)
-		for(let temp in machineJ.disk.dirs){
-			console.log(temp)
-			resArr.push(temp)
-		}
-	}
-
+function listFiles(passed){
+	
 }
 
 txt1.addEventListener("keypress", function(event) {
@@ -107,4 +65,13 @@ txt1.addEventListener("keypress", function(event) {
 		recognizeCommand();
 		// console.log("NIBBA")
 	}
+})
+
+txt1.addEventListener("keydown", function(event){
+	// console.log(event.keyCode)
+	let evtobj = window.event? event : event
+	if (evtobj.keyCode == 67 && evtobj.ctrlKey) { //CTRL + C 
+		visualizer();
+		txt1.value = ""
+	};
 })
