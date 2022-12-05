@@ -1,0 +1,54 @@
+#container-main{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+
+	overflow-y: scroll;
+	min-width: 650px;
+	max-width: 800px;
+	min-height: 400px;
+	max-height: 400px;
+
+	color: whitesmoke;
+}
+
+#container-input{
+	/*padding-top: 20px;*/
+	position: absolute;
+	top: 82.5%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 625px;
+}
+
+#in, #in-pre{
+	border-color: grey;
+	background-color: black;
+	color: whitesmoke;
+}
+
+#in-pre{
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.no-off{
+	/*margin-bottom: 1px;*/
+	margin: 0;
+	margin-left: 4px;
+	line-height: 20px;
+}
+
+.glass{
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border-radius: 10px;
+	border: 10px solid rgba(255, 255, 255, 0.18);
+	box-shadow: 0 0px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+body{
+	background-color: black;
+}

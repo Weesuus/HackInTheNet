@@ -1,0 +1,39 @@
+{
+	"username": "weesus",
+	"machine": "TestMachine",
+	"disk":{
+		"files":{},
+		"dirs":{
+			"bin":{
+				"files": {},
+				"dirs": {}
+			},
+			"home":{
+				"files": {},
+				"dirs": {
+					"weesus":{
+						"files": {},
+						"dirs": {
+							"Desktop": {
+								"files": {},
+								"dirs": {}
+							},
+							"Documents":{
+								"files": {},
+								"dirs": {}	
+							}
+						}
+					}
+				}
+			},
+			"log":{
+				"files": {},
+				"dirs": {}
+			},
+			"sys":{
+				"files": {},
+				"dirs": {}
+			}
+		}
+	}
+}
