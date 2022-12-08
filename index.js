@@ -19,6 +19,8 @@ let nowPath = "/home/weesus/";
 let username = "weesus"
 let homeDisp = "[" + username + "@MACHINE] ~ " // HOME ~
 let nowDisp = homeDisp; //HOME ~ - ANY OTHER
+let barPressed = true;
+let startChecking = 0;
 
 txtpre.innerText = nowDisp;
 
@@ -67,11 +69,12 @@ function recognizeCommand(){
 			txt1.value = "";
 		}else if((txt1.value[3] == ".") && (txt1.value[4] == ".")){
 			visualizer(txt1.value);
-
+			changeDirUpper();
+			txt1.value = "";
 		}else if(txt1.value[3] == "."){
 			visualizer(txt1.value);
 			containerMain.innerHTML += '<p class="no-off">' + ". cannot be resolved" + '</p>';
-			txt1.value = ""
+			txt1.value = "";
 		}else{
 			//FOLDER
 			visualizer(txt1.value);
@@ -91,10 +94,58 @@ function visualizer(){
 	}
 }
 
+function changeDirUpper(){
+	let countSlash = 0, result = "";
+	for(let i = 0; i<=nowPath.length - 1; i++){
+		if(nowPath[i] == "/"){
+			countSlash += 1;
+		}
+	}
 
+	let counterX = 0;
+	for(let i = 0; i<=nowPath.length - 1; i++){
+		if(nowPath[i] == "/"){
+			counterX += 1;
+		}
+
+		if((countSlash - 1) == counterX){
+			result += "/";
+			break;
+		}else{
+			result += nowPath[i];
+		}
+	}
+
+	// console.log(result)
+	let resultTMP = result.slice(0, -1);
+	countSlash = 0;
+	for(let i = 0; i<=resultTMP.length - 1; i++){
+		if(resultTMP[i] == "/"){
+			countSlash += 1;
+		}
+	}
+
+	counterX = 0;
+	let res = "";
+	for(let i = 0; i<=resultTMP.length; i++){
+		if(resultTMP[i] == "/"){
+			if((counterX-1) == countSlash){
+				break;
+			}else{
+				res += resultTMP[i];
+			}
+		}else{
+			res += resultTMP[i];
+		}
+		counterX += 1;
+	}
+
+	nowPath = result;
+	updateLine(result);
+}
 
 function changeDir(passed){	
-	let lastX  = "", counterX = 0, lastStart = 0; lastObj = null, tmpPath = "";
+	let lastX  = "", counterX = 0, lastStart = 0, lastObj = null, tmpPath = "";
 	for(var i = 0; i<=passed.length - 1; i++){
 		if(passed[i] == '/'){
 			if(counterX == 0){
@@ -108,8 +159,7 @@ function changeDir(passed){
 				}
 				tmpPath += lastX + "/" 
 				nowPath = tmpPath;
-				// console.log(lastX)
-				updateLine(lastX);
+				updateLine(nowPath);
             	break;
         	}else{
 				lastObj = lastObj[lastX];
@@ -125,7 +175,7 @@ function changeDir(passed){
 }
 
 function updateLine(passed){
-	if(passed == username){
+	if(passed.endsWith(username + "/")){
 		nowDisp = homeDisp;
 		txtpre.innerText = nowDisp;
 		// break;
@@ -169,10 +219,33 @@ function listFiles(passed){
 	// console.log(lastObj)
 }
 
+function myAutocomplete(){
+	let baseCommand = ["echo", "ls", "help", "clear", "cd"];
+	let otherComp = Object.keys(listFiles(nowPath));
+	
+	let result;
+	if(barPressed == true){
+		result = otherComp.filter(word => word.startsWith(txt1.value.slice(startChecking + 1)));
+	}else{
+		baseCommand.push.apply(baseCommand, otherComp);
+		result = baseCommand.filter(word => word.startsWith(txt1.value));
+	}
+
+	if(result[0] != null && barPressed == false){
+		txt1.value = result[0];
+	}else if(result[0] != null && barPressed == true){
+		txt1.value = txt1.value + result[0].slice(txt1.value.slice(startChecking + 1).length);
+	}else{
+		// console.log(result[0])
+	}
+
+}
+
 txt1.addEventListener("keypress", function(event) {
 	if (event.key === "Enter") {
 		event.preventDefault();
-		// visualizer();
+		startChecking = 0;
+		barPressed = false;
 		recognizeCommand();
 		// console.log("NIBBA")
 	}
@@ -183,6 +256,13 @@ txt1.addEventListener("keydown", function(event){
 	let evtobj = window.event? event : event
 	if (evtobj.keyCode == 67 && evtobj.ctrlKey) { //CTRL + C 
 		visualizer();
-		txt1.value = ""
-	};
+		txt1.value = "";
+	}else if(evtobj.keyCode == 9){
+		event.preventDefault();
+		// alert("prova");
+		myAutocomplete();
+	}else if(evtobj.keyCode == 32){
+		barPressed = true;
+		startChecking = (txt1.value.length);
+	}
 })
