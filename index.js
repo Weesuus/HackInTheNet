@@ -16,7 +16,9 @@ let diskTest = {
 };
 
 let nowPath = "/home/weesus/";
-let nowDisp = "[weesus@MACHINE] ~ "; //HOME ~ - ANY OTHER $
+let username = "weesus"
+let homeDisp = "[" + username + "@MACHINE] ~ " // HOME ~
+let nowDisp = homeDisp; //HOME ~ - ANY OTHER
 
 txtpre.innerText = nowDisp;
 
@@ -27,6 +29,7 @@ function recognizeCommand(){
 		containerMain.innerHTML += '<p class="no-off">' + "echo - Prints a String" + '</p>';
 		containerMain.innerHTML += '<p class="no-off">' + "clear - Clear the Console" + '</p>';
 		containerMain.innerHTML += '<p class="no-off">' + "ls - List Files and Directory in Current Path or Given Path" + '</p>';
+		containerMain.innerHTML += '<p class="no-off">' + "cd - Change Directory in the passed Folder or Path" + '</p>';
 		txt1.value = "";
 	}else if(txt1.value.startsWith('echo ')){
 		visualizer(txt1.value);
@@ -55,6 +58,26 @@ function recognizeCommand(){
 			})
 			txt1.value = "";
 		}
+	}else if(txt1.value.startsWith('cd ')){
+		if(txt1.value[3] == "/"){
+			//PATH
+			// console.log(1)
+			visualizer(txt1.value);
+			changeDir(txt1.value.slice(3));
+			txt1.value = "";
+		}else if((txt1.value[3] == ".") && (txt1.value[4] == ".")){
+			visualizer(txt1.value);
+
+		}else if(txt1.value[3] == "."){
+			visualizer(txt1.value);
+			containerMain.innerHTML += '<p class="no-off">' + ". cannot be resolved" + '</p>';
+			txt1.value = ""
+		}else{
+			//FOLDER
+			visualizer(txt1.value);
+			changeDir(nowPath + txt1.value.slice(3) + "/");
+			txt1.value = "";
+		}
 	}else{
 		visualizer();
 		containerMain.innerHTML += '<p class="no-off">' + txt1.value + " - Unknown Command" + '</p>';
@@ -65,6 +88,52 @@ function recognizeCommand(){
 function visualizer(){
 	if(txt1.value!='' || txt1.value!=' '){
 		containerMain.innerHTML += '<p class="no-off">' + nowDisp + txt1.value + '</p>';
+	}
+}
+
+
+
+function changeDir(passed){	
+	let lastX  = "", counterX = 0, lastStart = 0; lastObj = null, tmpPath = "";
+	for(var i = 0; i<=passed.length - 1; i++){
+		if(passed[i] == '/'){
+			if(counterX == 0){
+				lastObj = diskTest;
+				tmpPath = "/"
+			}else if(i == (passed.length - 1)){
+				lastObj = lastObj[lastX];
+				if(lastObj == null){
+					containerMain.innerHTML += '<p class="no-off">Error Directory not Found</p>';
+					break;
+				}
+				tmpPath += lastX + "/" 
+				nowPath = tmpPath;
+				// console.log(lastX)
+				updateLine(lastX);
+            	break;
+        	}else{
+				lastObj = lastObj[lastX];
+				tmpPath += lastX + "/"
+				lastStart = counterX;
+				lastX = "";
+			}
+		}else{
+			lastX += passed[i];
+		}
+		counterX+=1;
+	}
+}
+
+function updateLine(passed){
+	if(passed == username){
+		nowDisp = homeDisp;
+		txtpre.innerText = nowDisp;
+		// break;
+	}else{
+	// console.log(passed)
+		nowDisp = "[" + username + "@MACHINE " + passed + "] - ";
+		txtpre.innerText = nowDisp;
+		// break;
 	}
 }
 
