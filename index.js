@@ -60,6 +60,10 @@ function recognizeCommand(){
 			})
 			txt1.value = "";
 		}
+	}else if(txt1.value.startsWith('mkdir ')){
+			visualizer(txt1.value);
+			makeDir(txt1.value);
+			txt1.value = "";
 	}else if(txt1.value.startsWith('cd ')){
 		if(txt1.value[3] == "/"){
 			//PATH
@@ -79,6 +83,35 @@ function recognizeCommand(){
 			//FOLDER
 			visualizer(txt1.value);
 			changeDir(nowPath + txt1.value.slice(3) + "/");
+			txt1.value = "";
+		}
+	}else if(txt1.value.startsWith('rm ')){
+		if(txt1.value[3] == "/"){
+			//PATH
+			// console.log(1)
+			visualizer(txt1.value);
+			
+			if (txt1.value.includes(".")){
+				//FILE
+				let obj = listFiles(txt1.slice(3))
+				
+			}else{
+				//FOLDER
+			}
+
+			txt1.value = "";
+		}else{
+			//NAME
+			visualizer(txt1.value);
+			if(txt1.value.includes(".")){
+				//FILE
+				let obj = listFiles(nowPath);
+				delete obj[txt1.value.slice(3)];
+			}else{
+				//FOLDER
+				let obj = listFiles(nowPath);
+				delete obj[txt1.value.slice(3)];
+			}
 			txt1.value = "";
 		}
 	}else{
@@ -187,6 +220,10 @@ function updateLine(passed){
 	}
 }
 
+function deleteSomething(passed){
+
+}
+
 function listFiles(passed){
 	let lastX = "", counterX = 0, lastStart = 0, lastObj = null;
 	for (var i = 0; i <= passed.length - 1; i++) {
@@ -198,7 +235,11 @@ function listFiles(passed){
 			if(counterX == 0){
 				// console.log(22)
 				lastObj = diskTest;
-			}else if(i == (passed.length - 1)){
+				if (passed.length == 1){
+					return lastObj;
+					break;
+				}
+			}else if(i == (passed.length - 1) && counterX != 0){
 				lastObj = lastObj[lastX];
 				return lastObj;
 				// console.log("lastObj");
@@ -219,8 +260,18 @@ function listFiles(passed){
 	// console.log(lastObj)
 }
 
+function makeDir(passed){ //PASSED IS THE FOLDER NAME OR THE PATH
+	if(passed[0] == "/"){
+		//PATH
+	}else{
+		//NAME
+		let nowLS = listFiles(nowPath);
+		nowLS[passed.slice(6)] = {}
+	}
+}
+
 function myAutocomplete(){
-	let baseCommand = ["echo", "ls", "help", "clear", "cd"];
+	let baseCommand = ["echo", "ls", "help", "clear", "cd", "mkdir"];
 	let otherComp = Object.keys(listFiles(nowPath));
 	
 	let result;
