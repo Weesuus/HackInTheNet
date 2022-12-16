@@ -122,9 +122,10 @@ function delAfterLastSlash(passed){
                 break mainProc;
             }
         }else if(passed[i] == "/"){
-            tmpPath += segmentI + "/";
             counterDelta += 1;
-            if(counterDelta == counterSlash-1){
+            tmpPath += segmentI + "/";
+            segmentI = ""
+            if(counterDelta == counterSlash){
                 break mainProc;
             }
         }else{
@@ -148,6 +149,9 @@ function delBeforeLastSlash(passed){
     for(let i=0; i<passed.length; i++){
         if(i==0 && passed[0] == "/"){
             counterDelta += 1;
+            if(counterDelta == counterSlash){
+                startTaking = true;
+            }
         }else if(passed[i] == "/"){
             counterDelta += 1;
             if(counterDelta == counterSlash){
@@ -276,13 +280,23 @@ function updateLine(passed){
 function myAutocompleter(passed){
     if(passed.startsWith("/")){ // PATH
         let res = [];
-        console.log(delAfterLastSlash(passed))
-        let objX = listFiles(delAfterLastSlash(passed));//  PATH SENZA DOPO SLASH OBJ
+        
+        // console.log(delAfterLastSlash(passed))
+        // console.log(passed)
+
+        let objX = listFiles(delAfterLastSlash(passed));
         Object.entries(objX).forEach(([key, value]) => { 
         res.push(key);
         })
-        result = res.filter(word => word.startsWith(delBeforeLastSlash(passed))); //  PRENDERE DOPO L'ULTIMO DI SLASH
-        innerCommnand.value += result[0].slice(delBeforeLastSlash(passed).length);
+        result = res.filter(word => word.startsWith(delBeforeLastSlash(passed)));
+        
+        // console.log(result);
+        // console.log(result[0]);
+        // console.log(passed)
+        // console.log(delAfterLastSlash(passed))
+        // console.log(delBeforeLastSlash(passed).length)
+
+        innerCommnand.value += result[0].slice(delBeforeLastSlash(passed).length) + "/";
     }else{ // FILE,FOLDER
         let res=[];
         let objX = listFiles(nowPath);

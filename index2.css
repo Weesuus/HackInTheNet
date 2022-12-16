@@ -71,6 +71,7 @@ body{
     border: none;
     color: whitesmoke;
     background-color: #191919;
+    width: 70%;
 }
 
 #in:focus{
