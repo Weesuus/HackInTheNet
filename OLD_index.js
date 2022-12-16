@@ -15,6 +15,7 @@ let diskTest = {
 	}, "bin": {}, "log":{}, "sys":{"osT.sys": "version:X\ntheme:sus"}
 };
 
+let commandsCache = [], nowCache = 0;
 let nowPath = "/home/weesus/";
 let username = "weesus"
 let homeDisp = "[" + username + "@MACHINE] ~ " // HOME ~
@@ -271,8 +272,13 @@ function makeDir(passed){ //PASSED IS THE FOLDER NAME OR THE PATH
 }
 
 function myAutocomplete(){
+	let otherComp = [];
 	let baseCommand = ["echo", "ls", "help", "clear", "cd", "mkdir"];
-	let otherComp = Object.keys(listFiles(nowPath));
+	if(txt1.value.includes(" /") && barPressed == true){
+		//TODO AUTOCOMPLETING PATHING
+	}else{
+		otherComp = Object.keys(listFiles(nowPath));
+	}
 	
 	let result;
 	if(barPressed == true){
@@ -292,13 +298,18 @@ function myAutocomplete(){
 
 }
 
+function manageCommandCache(){
+
+}
+
 txt1.addEventListener("keypress", function(event) {
 	if (event.key === "Enter") {
 		event.preventDefault();
+		commandsCache.unshift([txt1.value, startChecking, barPressed])
 		startChecking = 0;
 		barPressed = false;
+		nowCache = 0;
 		recognizeCommand();
-		// console.log("NIBBA")
 	}
 })
 
@@ -308,6 +319,10 @@ txt1.addEventListener("keydown", function(event){
 	if (evtobj.keyCode == 67 && evtobj.ctrlKey) { //CTRL + C 
 		visualizer();
 		txt1.value = "";
+	}else if (evtobj.keyCode == 76 && evtobj.ctrlKey) { //CTRL + L 
+		evtobj.preventDefault()
+		containerMain.innerHTML = "";
+		txt1.value = "";
 	}else if(evtobj.keyCode == 9){
 		event.preventDefault();
 		// alert("prova");
@@ -315,5 +330,25 @@ txt1.addEventListener("keydown", function(event){
 	}else if(evtobj.keyCode == 32){
 		barPressed = true;
 		startChecking = (txt1.value.length);
+	}else if(evtobj.keyCode == 38){ //KEY UP
+		if(commandsCache[nowCache] != null){
+			txt1.value = commandsCache[nowCache][0];
+			startChecking = commandsCache[nowCache][1];
+			barPressed = commandsCache[nowCache][2];
+			if((commandsCache.length)-1 != nowCache){
+				nowCache += 1;
+			}
+		}
+	}else if(evtobj.keyCode == 40){ //KEY DOWN
+		if(nowCache>0){
+			if(commandsCache[nowCache] != null){
+				txt1.value = commandsCache[nowCache][0];
+				startChecking = commandsCache[nowCache][1];
+				barPressed = commandsCache[nowCache][2];
+			}
+			nowCache -= 1
+		}else{
+			txt1.value = ""
+		}
 	}
 })
