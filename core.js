@@ -3,6 +3,7 @@ let innerCommnand = document.getElementById("in");
 let containerTerminal = document.getElementById("containerTerminal");
 let containerInput = document.getElementById("containerInput");
 
+let allCommands = ["help", "echo", "clear", "ls", "cd", "touch", "mkdir", "rm"]
 let username = "weesus";
 let nowPath = "/home/" + username + "/";
 let homeDisp = "[" + username + "@MACHINE] ~ " // HOME ~ / ANY OTHER -
@@ -38,12 +39,15 @@ function commandsExecutioner(){
 		containerTerminal.innerHTML += '<p class="no-off">' + "clear - Clear the Console" + '</p>';
 		containerTerminal.innerHTML += '<p class="no-off">' + "ls - List Files and Directory in Current Path or Given Path" + '</p>';
 		containerTerminal.innerHTML += '<p class="no-off">' + "cd - Change Directory in the passed Folder ,Path or Upper(..)" + '</p>';
-		innerCommnand.value = "";
+		containerTerminal.innerHTML += '<p class="no-off">' + "touch - Create a Text File as passed Filename with Extension(filename.txt) or Path" + '</p>';
+		containerTerminal.innerHTML += '<p class="no-off">' + "mkdir - Make a Dir as passed Name or Folder Path" + '</p>';
+		containerTerminal.innerHTML += '<p class="no-off">' + "rm - Delete a File or a Folder as passed Name or Path" + '</p>';
+        innerCommnand.value = "";
 	}else if(innerCommnand.value.startsWith("echo ")){
         visualizer();
         containerTerminal.innerHTML += '<p class="no-off">' + innerCommnand.value.slice(5) + '</p>';
         innerCommnand.value = "";
-    }else if(innerCommnand.value == 'clear' || innerCommnand.value == 'clear '){
+    }else if(innerCommnand.value.startsWith('clear')){
         containerTerminal.innerHTML = "";
         innerCommnand.value = "";
     }else if(innerCommnand.value.startsWith("ls")){
@@ -84,6 +88,70 @@ function commandsExecutioner(){
         // console.log(nowPath);
         updateLine(nowPath);
         innerCommnand.value = "";
+    }else if(innerCommnand.value.startsWith("touch")){
+        if(takeArg(innerCommnand.value) == ""){
+            visualizer();
+		    containerTerminal.innerHTML += '<p class="no-off errorX">touch take a filename(with ext) or filepath(with ext)</p>';
+		    innerCommnand.value = "";    
+        }else{
+            //visualizer();
+            if(!takeArg(innerCommnand.value).includes(".")){
+                visualizer();
+                containerTerminal.innerHTML += '<p class="no-off errorX">' + innerCommnand.value + "the File need an Extension (txt,c,ecc.)" + '</p>';
+                innerCommnand.value = "";
+            }
+            if(takeArg(innerCommnand.value).startsWith("/")){ // PATH TO FILENAME
+                visualizer;
+                createFile(takeArg(innerCommnand.value));
+                innerCommnand.value = "";
+            }else{ // FILENAME
+                visualizer;
+                createFile(nowPath + takeArg(innerCommnand.value));
+                innerCommnand.value = "";
+            }
+        }
+    }else if(innerCommnand.value.startsWith("mkdir")){
+        if(takeArg(innerCommnand.value) == ""){
+            visualizer();
+		    containerTerminal.innerHTML += '<p class="no-off errorX">mkdir take a Name(that ends with /) or folder path</p>';
+		    innerCommnand.value = "";
+        }else{
+            //visualizer();
+            if(takeArg(innerCommnand.value).startsWith("/")){ // PATH TO FOLDER
+                visualizer;
+                if(takeArg(innerCommnand.value).endsWith("/")){
+                    createDir(takeArg(innerCommnand.value));
+                }else{
+                    createDir(takeArg(innerCommnand.value) + "/");
+                }
+                innerCommnand.value = "";
+            }else{ // FOLDERNAME
+                visualizer;
+                if(takeArg(innerCommnand.value).endsWith("/")){
+                    createDir(nowPath + takeArg(innerCommnand.value));
+                }else{
+                    createDir(nowPath + takeArg(innerCommnand.value) + "/");
+                }
+                // createFile(nowPath + takeArg(innerCommnand.value));
+                innerCommnand.value = "";
+            }
+        }
+    }else if(innerCommnand.value.startsWith("rm")){
+        let tmpX = takeArg(innerCommnand.value);
+        if(takeArg(innerCommnand.value).endsWith("/")){ // PATH
+            tmpX = tmpX.slice(0, -1);
+        }
+
+
+        if(tmpX.startsWith("/")){ // PATH
+            visualizer();
+            delete listFiles(delLastFromPath(takeArg(innerCommnand.value)))[takeLastSlash(takeArg(innerCommnand.value))]
+            innerCommnand.value = "";
+        }else{ // NAME
+            visualizer();
+            delete nowDisk[tmpX];
+            innerCommnand.value = ""; 
+        }
     }else{
         visualizer();
 		containerTerminal.innerHTML += '<p class="no-off errorX">' + innerCommnand.value + " - Unknown Command" + '</p>';
@@ -103,6 +171,31 @@ function takeArg(passed){
         }
     }
     return res;
+}
+function takeLastSlash(passed){
+    let counterSlash = 0;
+    for(let i=0; i<passed.length; i++){
+        if(passed[i] == "/"){
+            counterSlash += 1;
+        }
+    }
+
+    let segmentI = "";
+    tmpDisk = diskTest;
+    let counterDelta = 0, stopSign = true;
+    for(let i=0; i<passed.length; i++){
+        if(passed[i]=="/"){
+            counterDelta += 1;
+            if(counterDelta == counterSlash-1){
+                stopSign = false;
+            }
+        }else{
+            if(!stopSign){
+                segmentI += passed[i];
+            }
+        }
+    }
+    return segmentI;
 }
 function delAfterLastSlash(passed){
     let counterSlash = 0;
@@ -182,6 +275,7 @@ function delLastFromPath(passed){
         }else if(passed[i] == "/"){
             tmpPath += segmentI + "/";
             counterDelta += 1;
+            segmentI = "";
             if(counterDelta == counterSlash-1){
                 break mainProc;
             }
@@ -193,8 +287,27 @@ function delLastFromPath(passed){
     return tmpPath;
 }
 //END UTLIS
-
 //START DISK MANAGE
+function createFile(passed){
+    let tmpZELE = listFiles(delAfterLastSlash(passed));
+    // console.log(passed);
+    // console.log(delBeforeLastSlash(passed));
+    if(delBeforeLastSlash(passed) in tmpZELE){
+		containerTerminal.innerHTML += '<p class="no-off errorX">' + "This File already Exist" + '</p>';
+    }else{
+        tmpZELE[delBeforeLastSlash(passed)] = "";
+    }
+}
+function createDir(passed){
+    let tmpZELE = listFiles(delLastFromPath(passed));
+    // // console.log(tmpZELE);
+    // // console.log(passed);
+    if(takeLastSlash(passed).toString() in tmpZELE){
+		containerTerminal.innerHTML += '<p class="no-off errorX">' + "This Folder already Exist" + '</p>';
+    }else{
+        tmpZELE[takeLastSlash(passed)] = {};
+    }
+}
 function pathToObj(passed){
     let tmpDisk = diskTest;
     let segmentI = "", tmpPath = "/";
@@ -259,7 +372,6 @@ function changeDir(passed){
     }
 }
 //END DISK MANAGE
-
 //START GUI
 function updateWidth(){
     let valX = containerInput.offsetWidth - prefixPath.offsetWidth - 30;
@@ -277,7 +389,7 @@ function updateLine(passed){
 		// break;
 	}
 }
-function myAutocompleter(passed){
+function myAutocompleter(passed, kind){
     if(passed.startsWith("/")){ // PATH
         let res = [];
         
@@ -301,13 +413,13 @@ function myAutocompleter(passed){
         let res=[];
         let objX = listFiles(nowPath);
         Object.entries(objX).forEach(([key, value]) => {
-            // if(key.includes('.')){
-            //     res.push(key)
-            // }else{
-            //     res.push(key.toString()+"/")
-            // }
             res.push(key);
         })
+        if(kind==true){
+            allCommands.forEach(cmd => {
+                res.push(cmd);
+            })
+        }
         result = res.filter(word => word.startsWith(passed));
         innerCommnand.value += result[0].slice(passed.length);
     }
@@ -355,9 +467,9 @@ innerCommnand.addEventListener("keydown", function(event){
     }else if(eventObj.keyCode == 9){ // TAB - TABULATION COMPLETER (PATH,FILE,FOLDER)
         event.preventDefault();
         if(takeArg(innerCommnand.value) == "" || takeArg(innerCommnand.value) == null){
-            myAutocompleter(innerCommnand.value);
+            myAutocompleter(innerCommnand.value, true);
         }else{
-            myAutocompleter(takeArg(innerCommnand.value));
+            myAutocompleter(takeArg(innerCommnand.value), false);
         }
     }
 })
