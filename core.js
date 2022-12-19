@@ -3,7 +3,28 @@ let innerCommnand = document.getElementById("in");
 let containerTerminal = document.getElementById("containerTerminal");
 let containerInput = document.getElementById("containerInput");
 
-let username, nowPath, homeDisp, nowDisp, disk, nowDisk, machineName;
+let username, nowPath, homeDisp, nowDisp, disk, nowDisk, machineName, registerRoute = 0;
+let allCommands = ["help", "echo", "clear", "ls", "cd", "touch", "mkdir", "rm", "usrmod", "machinemod"]
+
+username = "user";
+machineName = "MACHINE";
+disk = {
+    "home": {}, "bin": {}, "log":{}, "sys":{"osT.sys": "version:X\ntheme:sus"}
+};
+disk["home"][username] = {
+    "Desktop": {},
+    "Documents": {}
+}
+nowPath = "/home/" + username + "/";
+homeDisp = "[" + username + "@" + machineName + "] ~ ";
+prefixPath.innerText = homeDisp;
+nowDisp = homeDisp;
+nowDisk = disk.home[username];
+
+containerTerminal.innerHTML += '<p class="no-off">' + nowDisp + "You can change the default username with 'usrmod newusername'" + '</p>';
+containerTerminal.innerHTML += '<p class="no-off">' + nowDisp + "You can change the default machine name with 'machinemod newmachinename'" + '</p>';
+containerTerminal.innerHTML += '<p class="no-off errorX">' + "Pay attention every time that you change Username or Machine Name all data will be Lost!" + '</p>';
+
 
 // LOADING SAVEDATA
 let form = document.getElementById("formSaves");
@@ -18,6 +39,9 @@ form.addEventListener('submit', event => {
     reader.readAsText(inputFile.files[0]);
     chargeSavedata(event);
     
+});
+saveBtn.addEventListener('click', event => {
+    saveSavedata();
 });
 function chargeSavedata(event){
     let str = event.target.result;
@@ -34,12 +58,27 @@ function chargeSavedata(event){
     nowDisk = disk.home[username];
 }
 function saveSavedata(){
-    savedata = {
+    let savedata = {
         "username": username,
         "machine": machineName,
         "disk": disk
     };
-    console.log(JSON.parse(savedata));
+    // console.log(JSON.stringify(savedata));
+    
+    const file = new File([JSON.stringify(savedata)], 'savedata.json', {
+        type: 'text/plain',
+    })
+
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(file)
+
+    link.href = url
+    link.download = file.name
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
 }
 
 let commandsCache = [];
@@ -50,6 +89,11 @@ function visualizer(){
         containerTerminal.innerHTML += '<p class="no-off">' + nowDisp + innerCommnand.value + '</p>';
     }
 }
+
+// function visualizerInput(passed){
+//     containerInput.innerHTML += '<p class="no-off">' + passed + '</p>';
+//     prefixPath.innerText = passed
+// }
 
 function commandsExecutioner(){
 
@@ -63,6 +107,9 @@ function commandsExecutioner(){
 		containerTerminal.innerHTML += '<p class="no-off">' + "touch - Create a Text File as passed Filename with Extension(filename.txt) or Path" + '</p>';
 		containerTerminal.innerHTML += '<p class="no-off">' + "mkdir - Make a Dir as passed Name or Folder Path" + '</p>';
 		containerTerminal.innerHTML += '<p class="no-off">' + "rm - Delete a File or a Folder as passed Name or Path" + '</p>';
+		containerTerminal.innerHTML += '<p class="no-off">' + "usermod - Change username (ATTENTION:loss all data!)" + '</p>';
+		containerTerminal.innerHTML += '<p class="no-off">' + "machinemod - Change machine name (ATTENTION:loss all data!)" + '</p>';
+
         innerCommnand.value = "";
 	}else if(innerCommnand.value.startsWith("echo ")){
         visualizer();
@@ -163,7 +210,6 @@ function commandsExecutioner(){
             tmpX = tmpX.slice(0, -1);
         }
 
-
         if(tmpX.startsWith("/")){ // PATH
             visualizer();
             delete listFiles(delLastFromPath(takeArg(innerCommnand.value)))[takeLastSlash(takeArg(innerCommnand.value))]
@@ -172,6 +218,52 @@ function commandsExecutioner(){
             visualizer();
             delete nowDisk[tmpX];
             innerCommnand.value = ""; 
+        }
+    }else if(innerCommnand.value.startsWith("usrmod")){
+        visualizer();
+        if(takeArg(innerCommnand.value) != ""){
+            username = takeArg(innerCommnand.value);
+            machineName = machineName;
+            disk = {
+                "home": {}, "bin": {}, "log":{}, "sys":{"osT.sys": "version:X\ntheme:sus"}
+            };
+            disk["home"][username] = {
+                "Desktop": {},
+                "Documents": {}
+            }
+            nowPath = "/home/" + username + "/";
+            homeDisp = "[" + username + "@" + machineName + "] ~ ";
+            prefixPath.innerText = homeDisp;
+            nowDisp = homeDisp;
+            nowDisk = disk.home[username];
+            containerTerminal.innerHTML += '<p class="no-off">' + nowDisp + "Username Changed" + '</p>';
+            innerCommnand.value = ""
+        }else{
+            containerTerminal.innerHTML += '<p class="no-off errorX">' + innerCommnand.value + " - Takes one argument, ex: usrmod newusername" + '</p>';
+		    innerCommnand.value = "";
+        }
+    }else if(innerCommnand.value.startsWith("machinemod")){
+        visualizer();
+        if(takeArg(innerCommnand.value) != ""){
+            username = username;
+            machineName = takeArg(innerCommnand.value);
+            disk = {
+                "home": {}, "bin": {}, "log":{}, "sys":{"osT.sys": "version:X\ntheme:sus"}
+            };
+            disk["home"][username] = {
+                "Desktop": {},
+                "Documents": {}
+            }
+            nowPath = "/home/" + username + "/";
+            homeDisp = "[" + username + "@" + machineName + "] ~ ";
+            prefixPath.innerText = homeDisp;
+            nowDisp = homeDisp;
+            nowDisk = disk.home[username];
+            containerTerminal.innerHTML += '<p class="no-off">' + nowDisp + "Username Changed" + '</p>';
+            innerCommnand.value = ""
+        }else{
+            containerTerminal.innerHTML += '<p class="no-off errorX">' + innerCommnand.value + " - Takes one argument, ex: usrmod newusername" + '</p>';
+		    innerCommnand.value = "";
         }
     }else{
         visualizer();
@@ -456,6 +548,7 @@ innerCommnand.addEventListener("keydown", function(event){
         
         commandsExecutioner();
         updateWidth();
+        innerCommnand.scrollTo(0,20);
     }
 })
 
