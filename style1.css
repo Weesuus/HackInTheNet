@@ -11,6 +11,23 @@ body{
     color: #751012;
 }
 
+.containerCharge{
+    color: black;
+
+    border: 2px solid;
+    border-color: black;
+    background-color: #161F38;
+
+    min-height: 170px;
+    max-height: 170px;
+    max-width: 500px; 
+
+    margin: auto;
+    width: 100%;
+    padding: 10px;
+    margin-top: 35px;
+}
+
 .containerHosts{
     border: 2px solid;
     border-color: black;
@@ -22,7 +39,7 @@ body{
     
     /*CENTER*/
     margin: auto;
-    width: 50%;
+    width: 100%;
     padding: 10px;
     margin-top: 35px;
 }
