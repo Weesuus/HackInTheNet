@@ -3,47 +3,26 @@ let innerCommnand = document.getElementById("in");
 let containerTerminal = document.getElementById("containerTerminal");
 let containerInput = document.getElementById("containerInput");
 
-let username, nowPath, homeDisp, nowDisp, disk, nowDisk, machineName;
-
-// LOADING SAVEDATA
-let form = document.getElementById("formSaves");
-let inputFile = document.getElementById("jsonIn");
-let saveBtn = document.getElementById("saveBtn")
-form.addEventListener('submit', event => {
-    event.preventDefault();
-    if (!inputFile.value.length) return;
-
-    let reader = new FileReader();
-    reader.onload = chargeSavedata;
-    reader.readAsText(inputFile.files[0]);
-    chargeSavedata(event);
-    
-});
-function chargeSavedata(event){
-    let str = event.target.result;
-    let json = JSON.parse(str);
-    username = json["username"];
-    machineName = json["machine"];
-    disk = json["disk"];
-    // console.log(username);
-
-    nowPath = "/home/" + username + "/";
-    homeDisp = "[" + username + "@" + machineName + "] ~ "; // HOME ~ / ANY OTHER -
-    prefixPath.innerText = homeDisp;
-    nowDisp = homeDisp;
-    nowDisk = disk.home[username];
-}
-function saveSavedata(){
-    savedata = {
-        "username": username,
-        "machine": machineName,
-        "disk": disk
-    };
-    console.log(JSON.parse(savedata));
-}
+let allCommands = ["help", "echo", "clear", "ls", "cd", "touch", "mkdir", "rm"]
+let username = "weesus";
+let nowPath = "/home/" + username + "/";
+let homeDisp = "[" + username + "@MACHINE] ~ " // HOME ~ / ANY OTHER -
+nowDisp = homeDisp;
 
 let commandsCache = [];
 let nowCache = 0;
+
+let diskTest = {
+    "home": {}, "bin": {}, "log":{}, "sys":{"osT.sys": "version:X\ntheme:sus"}
+};
+
+diskTest["home"][username] = {
+    "Desktop": {},
+    "Documents": {},
+    "ecc.txt": "Enniente oggi va cosi"
+}
+
+let nowDisk = diskTest.home[username]; 
 
 function visualizer(){
     if(innerCommnand.value != '' || innerCommnand != " "){
@@ -202,7 +181,7 @@ function takeLastSlash(passed){
     }
 
     let segmentI = "";
-    tmpDisk = disk;
+    tmpDisk = diskTest;
     let counterDelta = 0, stopSign = true;
     for(let i=0; i<passed.length; i++){
         if(passed[i]=="/"){
@@ -227,7 +206,7 @@ function delAfterLastSlash(passed){
     }
 
     let tmpPath = "/", segmentI = "";
-    tmpDisk=disk;
+    tmpDisk=diskTest;
     let counterDelta = 0;
     mainProc: for(let i=0; i<passed.length; i++){
         if(i==0 && passed[0] == "/"){
@@ -258,7 +237,7 @@ function delBeforeLastSlash(passed){
 
     let startTaking = false;
     let segmentI = "";
-    tmpDisk=disk;
+    tmpDisk=diskTest;
     let counterDelta = 0;
     for(let i=0; i<passed.length; i++){
         if(i==0 && passed[0] == "/"){
@@ -285,7 +264,7 @@ function delLastFromPath(passed){
         }
     }
 
-    let tmpPath = "/", segmentI = "", tmpDisk=disk;
+    let tmpPath = "/", segmentI = "", tmpDisk=diskTest;
     let counterDelta = 0;
     mainProc: for(let i=0; i<passed.length; i++){
         if(i==0 && passed[0] == "/"){
@@ -308,6 +287,7 @@ function delLastFromPath(passed){
     return tmpPath;
 }
 //END UTLIS
+null; lo uso pe legge
 //START DISK MANAGE
 function createFile(passed){
     let tmpZELE = listFiles(delAfterLastSlash(passed));
@@ -330,7 +310,7 @@ function createDir(passed){
     }
 }
 function pathToObj(passed){
-    let tmpDisk = disk;
+    let tmpDisk = diskTest;
     let segmentI = "", tmpPath = "/";
     for(let i=0; i<passed.length; i++){
         if(i==0 && passed[0] == "/"){
@@ -351,7 +331,7 @@ function pathToObj(passed){
     }
 }
 function listFiles(passed){
-    let tmpDisk = disk;
+    let tmpDisk = diskTest;
     let segmentI = "";
     for(let i=0; i<passed.length; i++){
         if(i==0 && passed[0] == "/"){
@@ -393,6 +373,7 @@ function changeDir(passed){
     }
 }
 //END DISK MANAGE
+null;
 //START GUI
 function updateWidth(){
     let valX = containerInput.offsetWidth - prefixPath.offsetWidth - 30;

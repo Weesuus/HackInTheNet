@@ -1,0 +1,16 @@
+{
+    "username": "weesus",
+    "machine": "MACHINE",
+    "disk": {
+        "home": {
+            "weesus":{
+                "Desktop": {},
+                "Documents": {},
+                "ecc.txt": "Enniente oggi va cosi"
+            }
+        },
+        "bin": {},
+        "log":{},
+        "sys":{"osT.sys": "version:X\ntheme:sus"}
+    }
+}
