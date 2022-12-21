@@ -56,6 +56,8 @@ function chargeSavedata(event){
     prefixPath.innerText = homeDisp;
     nowDisp = homeDisp;
     nowDisk = disk.home[username];
+
+    containerTerminal.innerHTML = "";
 }
 function saveSavedata(){
     let savedata = {
