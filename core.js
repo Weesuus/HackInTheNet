@@ -132,6 +132,7 @@ function commandsExecutioner(){
                 }
 				containerTerminal.innerHTML += '<p class="no-off">' + tmpKey + '</p>';
 			})
+            // TEST
             innerCommnand.value = "";
         }else{
             //PASSED
